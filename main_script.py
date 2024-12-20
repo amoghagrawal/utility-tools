@@ -39,20 +39,6 @@ class OBJECT_PT_CustomPanel(bpy.types.Panel):
 
         box = layout.box()
         row = box.row()
-        row.prop(scene, "expand_export", text="Export Helper", emboss=False, icon="TRIA_DOWN" if scene.expand_export else "TRIA_RIGHT")
-        if scene.expand_export:
-            box.prop(scene, "export_format")
-            box.prop(scene, "export_scope")
-            box.prop(scene, "export_apply_modifiers")
-            box.prop(scene, "export_include_animation")
-            box.prop(scene, "export_embed_textures")
-            box.prop(scene, "export_compress")
-            box.operator("object.export_helper")
-
-        layout.separator()
-
-        box = layout.box()
-        row = box.row()
         row.prop(scene, "expand_hierarchy", text="Hierarchy Organizer", emboss=False, icon="TRIA_DOWN" if scene.expand_hierarchy else "TRIA_RIGHT")
         if scene.expand_hierarchy:
             box.operator("object.organize_hierarchy")
@@ -156,45 +142,6 @@ class OBJECT_OT_CleanupScene(bpy.types.Operator):
                 data_block.remove(item)
                 removed_count += 1
         return removed_count
-
-
-class OBJECT_OT_ExportHelper(bpy.types.Operator):
-    bl_idname = "object.export_helper"
-    bl_label = "Export"
-
-    filepath: bpy.props.StringProperty(subtype='FILE_PATH')
-
-    def invoke(self, context, event):
-        context.window_manager.fileselect_add(self)
-        return {'RUNNING_MODAL'}
-
-    def execute(self, context):
-        format = context.scene.export_format
-        scope = context.scene.export_scope
-        apply_modifiers = context.scene.export_apply_modifiers
-        include_animation = context.scene.export_include_animation
-        embed_textures = context.scene.export_embed_textures
-        compress = context.scene.export_compress
-
-        if format == 'FBX':
-            bpy.ops.export_scene.fbx(filepath=self.filepath, 
-                                     use_selection=(scope == 'SELECTED'), 
-                                     apply_modifiers=apply_modifiers, 
-                                     bake_anim=include_animation)
-        elif format == 'GLTF':
-            bpy.ops.export_scene.gltf(filepath=self.filepath, 
-                                      export_selected=(scope == 'SELECTED'), 
-                                      export_apply=apply_modifiers, 
-                                      export_animations=include_animation,
-                                      export_texture_dir="",
-                                      export_embed_images=embed_textures)
-        elif format == 'OBJ':
-            bpy.ops.export_scene.obj(filepath=self.filepath, 
-                                     use_selection=(scope == 'SELECTED'), 
-                                     use_animation=include_animation)
-
-        self.report({'INFO'}, f"Exported to {self.filepath}")
-        return {'FINISHED'}
 
 
 class OBJECT_OT_OrganizeHierarchy(bpy.types.Operator):
@@ -347,11 +294,11 @@ class OBJECT_OT_MergeObjects(bpy.types.Operator):
         self.report({'INFO'}, "Objects merged.")
         return {'FINISHED'}
 
+
 def register():
     bpy.utils.register_class(OBJECT_PT_CustomPanel)
     bpy.utils.register_class(OBJECT_OT_RenameSelectedObjects)
     bpy.utils.register_class(OBJECT_OT_CleanupScene)
-    bpy.utils.register_class(OBJECT_OT_ExportHelper)
     bpy.utils.register_class(OBJECT_OT_OrganizeHierarchy)
     bpy.utils.register_class(OBJECT_OT_RenameCollections)
     bpy.utils.register_class(OBJECT_OT_DuplicateObjects)
@@ -367,18 +314,6 @@ def register():
     bpy.types.Scene.cleanup_unused_materials = bpy.props.BoolProperty(name="Unused Materials", default=True)
     bpy.types.Scene.cleanup_unused_textures = bpy.props.BoolProperty(name="Unused Textures", default=True)
     bpy.types.Scene.cleanup_unused_meshes = bpy.props.BoolProperty(name="Unused Meshes", default=True)
-    bpy.types.Scene.export_format = bpy.props.EnumProperty(
-        name="Format",
-        items=[('FBX', "FBX", ""), ('GLTF', "glTF", ""), ('OBJ', "OBJ", "")]
-    )
-    bpy.types.Scene.export_scope = bpy.props.EnumProperty(
-        name="Scope",
-        items=[('ALL', "All Objects", ""), ('SELECTED', "Selected Only", "")]
-    )
-    bpy.types.Scene.export_apply_modifiers = bpy.props.BoolProperty(name="Apply Modifiers", default=False)
-    bpy.types.Scene.export_include_animation = bpy.props.BoolProperty(name="Include Animation", default=False)
-    bpy.types.Scene.export_embed_textures = bpy.props.BoolProperty(name="Embed Textures", default=False)
-    bpy.types.Scene.export_compress = bpy.props.BoolProperty(name="Compress", default=False)
     bpy.types.Scene.collection_renamer_prefix = bpy.props.StringProperty(name="Prefix")
     bpy.types.Scene.collection_renamer_suffix = bpy.props.StringProperty(name="Suffix")
     bpy.types.Scene.duplicate_count = bpy.props.IntProperty(name="Duplicate Count", default=1, min=1)
@@ -412,7 +347,6 @@ def register():
 
     bpy.types.Scene.expand_renamer = bpy.props.BoolProperty(name="Expand Renamer", default=True)
     bpy.types.Scene.expand_cleanup = bpy.props.BoolProperty(name="Expand Cleanup", default=True)
-    bpy.types.Scene.expand_export = bpy.props.BoolProperty(name="Expand Export", default=True)
     bpy.types.Scene.expand_hierarchy = bpy.props.BoolProperty(name="Expand Hierarchy", default=True)
     bpy.types.Scene.expand_duplicator = bpy.props.BoolProperty(name="Expand Duplicator", default=True)
     bpy.types.Scene.expand_aligner = bpy.props.BoolProperty(name="Expand Aligner", default=True)
@@ -420,11 +354,11 @@ def register():
     bpy.types.Scene.expand_colorizer = bpy.props.BoolProperty(name="Expand Colorizer", default=True)
     bpy.types.Scene.expand_merger = bpy.props.BoolProperty(name="Expand Merger", default=True)
 
+
 def unregister():
     bpy.utils.unregister_class(OBJECT_PT_CustomPanel)
     bpy.utils.unregister_class(OBJECT_OT_RenameSelectedObjects)
     bpy.utils.unregister_class(OBJECT_OT_CleanupScene)
-    bpy.utils.unregister_class(OBJECT_OT_ExportHelper)
     bpy.utils.unregister_class(OBJECT_OT_OrganizeHierarchy)
     bpy.utils.unregister_class(OBJECT_OT_RenameCollections)
     bpy.utils.unregister_class(OBJECT_OT_DuplicateObjects)
@@ -440,12 +374,6 @@ def unregister():
     del bpy.types.Scene.cleanup_unused_materials
     del bpy.types.Scene.cleanup_unused_textures
     del bpy.types.Scene.cleanup_unused_meshes
-    del bpy.types.Scene.export_format
-    del bpy.types.Scene.export_scope
-    del bpy.types.Scene.export_apply_modifiers
-    del bpy.types.Scene.export_include_animation
-    del bpy.types.Scene.export_embed_textures
-    del bpy.types.Scene.export_compress
     del bpy.types.Scene.collection_renamer_prefix
     del bpy.types.Scene.collection_renamer_suffix
     del bpy.types.Scene.duplicate_count
@@ -460,13 +388,13 @@ def unregister():
 
     del bpy.types.Scene.expand_renamer
     del bpy.types.Scene.expand_cleanup
-    del bpy.types.Scene.expand_export
     del bpy.types.Scene.expand_hierarchy
     del bpy.types.Scene.expand_duplicator
     del bpy.types.Scene.expand_aligner
     del bpy.types.Scene.expand_randomizer
     del bpy.types.Scene.expand_colorizer
     del bpy.types.Scene.expand_merger
+
 
 if __name__ == "__main__":
     register()
