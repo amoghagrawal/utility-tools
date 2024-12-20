@@ -6,7 +6,6 @@ This Blender add-on provides a collection of utility tools to streamline various
 
 - **Object Renamer**: Rename selected objects with a prefix, suffix, and optional numbering
 - **Scene Cleanup**: Remove unused materials, textures, and meshes from the scene
-- **Export Helper**: Export objects in various formats (FBX, glTF, OBJ) with customizable settings
 - **Hierarchy Organizer**: Organize objects into collections based on their type.
 - **Collection Renamer**: Rename collections with a prefix and suffix
 - **Object Duplicator**: Duplicate selected objects a specified number of times
