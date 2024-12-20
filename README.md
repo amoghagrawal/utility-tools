@@ -29,4 +29,4 @@ This Blender add-on provides a collection of utility tools to streamline various
 
 ## Video Demo
 
-Check out the [video demo](https://cloud-q3ggl8i3b-hack-club-bot.vercel.app/0plugin_demo.mp4) to see the add-on in action.
+Check out the [video demo](https://cloud-99c4qkohh-hack-club-bot.vercel.app/0extensiondemo.mp4) to see the add-on in action.
